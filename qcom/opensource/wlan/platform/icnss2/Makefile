@@ -3,6 +3,7 @@
 include $(WLAN_PLATFORM_ROOT)/icnss2/parrot_gki_defconfig
 
 ccflags-y += -Wmissing-prototypes
+ccflags-y += -I$(srctree)/drivers/misc/hwid/
 
 ifeq ($(CONFIG_CNSS_OUT_OF_TREE),y)
 ccflags-y += -I$(WLAN_PLATFORM_ROOT)/cnss_utils
