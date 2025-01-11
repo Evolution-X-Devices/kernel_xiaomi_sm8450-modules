@@ -725,4 +725,6 @@ int goodix_get_touch_type(struct device_node *np);
 void goodix_fb_ext_ctrl(int suspend);
 */
 
+int goodix_check_ts_id_gpio(struct device *dev);
+
 #endif
