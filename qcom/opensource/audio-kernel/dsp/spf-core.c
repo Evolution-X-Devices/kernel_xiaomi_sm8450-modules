@@ -23,6 +23,7 @@
 #include <ipc/gpr-lite.h>
 #include <dsp/spf-core.h>
 #include <dsp/digital-cdc-rsc-mgr.h>
+#include <linux/mmhardware_sysfs.h>
 
 #define APM_STATE_READY_TIMEOUT_MS    10000
 #define Q6_READY_TIMEOUT_MS 1000
@@ -298,7 +299,10 @@ static int spf_core_probe(struct gpr_device *adev)
 	if (spf_core_priv->is_initial_boot)
 		schedule_work(&spf_core_priv->add_chld_dev_work);
 	mutex_unlock(&spf_core_priv->lock);
-
+	/* register adsp hardware */
+#ifdef CONFIG_MMHARDWARE_DETECTION
+	register_kobj_under_mmsysfs(MM_HW_ADSP, MM_HARDWARE_SYSFS_ADSP_FOLDER);
+#endif
 	return 0;
 }
 
