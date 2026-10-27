@@ -1916,6 +1916,7 @@ const char *cmd_set_prop_map[DSI_CMD_SET_MAX] = {
 	"mi,mdss-dsi-bl-sync-on-command",
 	"mi,mdss-dsi-bl-sync-off-command",
 	"mi,mdss-dsi-exit-90fps-timing-switch-command",
+	"mi,mdss-dsi-auto-update-gamma-command",
 };
 
 const char *cmd_set_state_map[DSI_CMD_SET_MAX] = {
@@ -1959,6 +1960,7 @@ const char *cmd_set_state_map[DSI_CMD_SET_MAX] = {
 	"mi,mdss-dsi-bl-sync-on-command-state",
 	"mi,mdss-dsi-bl-sync-off-command-state",
 	"mi,mdss-dsi-exit-90fps-timing-switch-command-state",
+	"mi,mdss-dsi-auto-update-gamma-command-state",
 };
 
 int dsi_panel_get_cmd_pkt_count(const char *data, u32 length, u32 *cnt)
