@@ -7813,7 +7813,9 @@ int dsi_display_set_mode(struct dsi_display *display,
 			adj_mode.priv_info->clk_rate_hz);
 
 	memcpy(display->panel->cur_mode, &adj_mode, sizeof(adj_mode));
-	dsi_display_mi_notify(display, DSI_DISPLAY_MI_FPS, timing.refresh_rate);
+	/* Xiaomi panels describe low DDIC refresh rates through h_skew */
+	dsi_display_mi_notify(display, DSI_DISPLAY_MI_FPS,
+			timing.h_skew ? timing.h_skew : timing.refresh_rate);
 error:
 	mutex_unlock(&display->display_lock);
 	return rc;
