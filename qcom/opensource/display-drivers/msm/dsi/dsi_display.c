@@ -7255,6 +7255,7 @@ int dsi_display_get_modes_helper(struct dsi_display *display,
 
 			dsi_display_get_dfps_timing(display, sub_mode,
 					curr_refresh_rate);
+			dsi_panel_mi_override_dfps_vfp(display->panel, sub_mode);
 
 			/* Avoid override for first sub mode in POMS enabled video mode usecase */
 			if ((i != start) && support_cmd_mode && support_video_mode)
