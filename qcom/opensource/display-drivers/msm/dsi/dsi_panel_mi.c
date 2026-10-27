@@ -3,6 +3,9 @@
  * Copyright (C) 2026 The LineageOS Project
  */
 
+#include <linux/gpio.h>
+#include <linux/interrupt.h>
+#include <linux/of_gpio.h>
 #include <linux/slab.h>
 #include <video/mipi_display.h>
 
@@ -53,6 +56,43 @@ static void dsi_panel_mi_parse_lhbm(struct dsi_panel *panel)
 			&mi->lhbm_alpha_or);
 }
 
+static void dsi_panel_mi_parse_esd(struct dsi_panel *panel)
+{
+	struct dsi_parser_utils *utils = &panel->utils;
+	struct dsi_panel_mi *mi = &panel->mi;
+	struct of_phandle_args args;
+	u32 flags = 0;
+	int gpio, rc;
+
+	gpio = of_get_named_gpio(utils->data, "mi,esd-err-irq-gpio", 0);
+	if (!gpio_is_valid(gpio))
+		return;
+
+	if (!of_parse_phandle_with_args(utils->data, "mi,esd-err-irq-gpio",
+			"#gpio-cells", 0, &args)) {
+		if (args.args_count > 1)
+			flags = args.args[1];
+		of_node_put(args.np);
+	}
+
+	rc = devm_gpio_request_one(panel->parent, gpio, GPIOF_IN,
+			"esd_err_irq_gpio");
+	if (rc) {
+		DSI_ERR("[%s] failed to request esd gpio %d, rc=%d\n",
+				panel->name, gpio, rc);
+		return;
+	}
+
+	rc = gpio_to_irq(gpio);
+	if (rc < 0)
+		return;
+
+	mi->esd_irq = rc;
+	mi->esd_irq_flags = flags;
+	mi->esd_ignore_in_doze = utils->read_bool(utils->data,
+			"mi,panel-ignore-esd-in-aod");
+}
+
 void dsi_panel_mi_parse(struct dsi_panel *panel)
 {
 	struct dsi_parser_utils *utils = &panel->utils;
@@ -70,6 +110,7 @@ void dsi_panel_mi_parse(struct dsi_panel *panel)
 		mi->doze_hbm_threshold = 100;
 
 	dsi_panel_mi_parse_lhbm(panel);
+	dsi_panel_mi_parse_esd(panel);
 }
 
 void dsi_panel_mi_parse_cmd_update(struct dsi_panel_cmd_set *set,
@@ -433,4 +474,22 @@ int dsi_panel_mi_set_lhbm(struct dsi_panel *panel, u32 nits)
 	mi->lhbm_nits = nits;
 
 	return 0;
+}
+
+void dsi_panel_mi_esd_irq_ctrl(struct dsi_panel *panel, bool enable)
+{
+	struct dsi_panel_mi *mi = &panel->mi;
+
+	if (!mi->esd_irq || mi->esd_irq_enabled == enable)
+		return;
+
+	if (enable) {
+		enable_irq_wake(mi->esd_irq);
+		enable_irq(mi->esd_irq);
+	} else {
+		disable_irq_wake(mi->esd_irq);
+		disable_irq_nosync(mi->esd_irq);
+	}
+
+	mi->esd_irq_enabled = enable;
 }
