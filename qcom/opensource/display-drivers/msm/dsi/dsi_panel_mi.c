@@ -8,11 +8,83 @@
 #include <linux/interrupt.h>
 #include <linux/of_gpio.h>
 #include <linux/slab.h>
+#include <linux/soc/qcom/smem.h>
 #include <video/mipi_display.h>
 
 #include "dsi_panel.h"
 #include "dsi_panel_mi.h"
 #include "dsi_panel_mi_alpha.h"
+
+#define SMEM_SW_DISPLAY_LHBM_TABLE 498
+
+/*
+ * The bootloader stores the calibrated local HBM gamma of Novatek panels in
+ * SMEM, as 12 bit R, G and B values. mi,local-hbm-white-param-offsets gives
+ * the offsets of the 1000 and 110 nit values, which are optionally scaled by
+ * mi,local-hbm-white-<level>nit-scale percent per channel and offset by
+ * mi,local-hbm-white-<level>nit-add.
+ */
+static void dsi_panel_mi_parse_lhbm_white(struct dsi_panel *panel)
+{
+	static const char * const scale_props[] = {
+		"mi,local-hbm-white-1000nit-scale",
+		"mi,local-hbm-white-110nit-scale",
+	};
+	static const char * const add_props[] = {
+		"mi,local-hbm-white-1000nit-add",
+		"mi,local-hbm-white-110nit-add",
+	};
+	struct dsi_parser_utils *utils = &panel->utils;
+	struct dsi_panel_mi *mi = &panel->mi;
+	u32 offsets[2], scale[3], add, val;
+	size_t size;
+	u8 *table;
+	int i, j;
+
+	if (utils->read_u32_array(utils->data,
+			"mi,local-hbm-white-param-offsets", offsets, 2))
+		return;
+
+	table = qcom_smem_get(QCOM_SMEM_HOST_ANY, SMEM_SW_DISPLAY_LHBM_TABLE,
+			&size);
+	if (IS_ERR_OR_NULL(table)) {
+		DSI_INFO("[%s] no local hbm calibration\n", panel->name);
+		return;
+	}
+
+	for (i = 0; i < ARRAY_SIZE(mi->lhbm_white); i++) {
+		if (offsets[i] + sizeof(mi->lhbm_white[i]) > size)
+			continue;
+
+		memcpy(mi->lhbm_white[i], &table[offsets[i]],
+				sizeof(mi->lhbm_white[i]));
+
+		mi->lhbm_white_valid[i] = true;
+		for (j = 0; j < 3; j++)
+			if (!mi->lhbm_white[i][j * 2] &&
+			    !mi->lhbm_white[i][j * 2 + 1])
+				mi->lhbm_white_valid[i] = false;
+
+		if (!mi->lhbm_white_valid[i]) {
+			DSI_ERR("[%s] invalid local hbm calibration %d\n",
+					panel->name, i);
+			continue;
+		}
+
+		if (utils->read_u32_array(utils->data, scale_props[i], scale, 3))
+			scale[0] = scale[1] = scale[2] = 100;
+		add = 0;
+		utils->read_u32(utils->data, add_props[i], &add);
+
+		for (j = 0; j < 3; j++) {
+			val = (mi->lhbm_white[i][j * 2] << 8) |
+					mi->lhbm_white[i][j * 2 + 1];
+			val = DIV_ROUND_CLOSEST(val * scale[j], 100) + add;
+			mi->lhbm_white[i][j * 2] = val >> 8;
+			mi->lhbm_white[i][j * 2 + 1] = val & 0xff;
+		}
+	}
+}
 
 static void dsi_panel_mi_parse_lhbm(struct dsi_panel *panel)
 {
@@ -31,6 +103,8 @@ static void dsi_panel_mi_parse_lhbm(struct dsi_panel *panel)
 			&mi->lhbm_df_min);
 	utils->read_u32(utils->data, "mi,local-hbm-b2-reg-min",
 			&mi->lhbm_b2_min);
+
+	dsi_panel_mi_parse_lhbm_white(panel);
 
 	if (utils->read_string(utils->data, "mi,local-hbm-alpha-table", &name))
 		return;
@@ -388,7 +462,7 @@ static int dsi_panel_mi_lhbm_on(struct dsi_panel *panel, u32 nits)
 	struct dsi_panel_cmd_set *sets = panel->cur_mode->priv_info->cmd_sets;
 	enum dsi_cmd_set_type type;
 	u32 dbv, alpha;
-	int rc;
+	int white, rc;
 
 	if (mi->doze_active != DSI_PANEL_MI_DOZE_OFF) {
 		type = nits == 110 ? DSI_CMD_SET_MI_LHBM_HLPM_WHITE_110NIT :
@@ -435,6 +509,13 @@ static int dsi_panel_mi_lhbm_on(struct dsi_panel *panel, u32 nits)
 	if (mi->lhbm_b2_min)
 		dsi_panel_mi_update_param(panel, type, 0xb2,
 				max(dbv, mi->lhbm_b2_min));
+
+	white = type == DSI_CMD_SET_MI_LHBM_NORMAL_WHITE_110NIT ||
+			type == DSI_CMD_SET_MI_LHBM_HLPM_WHITE_110NIT;
+	if (mi->lhbm_white_valid[white])
+		dsi_panel_mi_update_cmd_set(panel, type, 0xd0,
+				mi->lhbm_white[white],
+				sizeof(mi->lhbm_white[white]));
 
 	rc = dsi_panel_tx_cmd_set(panel, type);
 	if (rc)
