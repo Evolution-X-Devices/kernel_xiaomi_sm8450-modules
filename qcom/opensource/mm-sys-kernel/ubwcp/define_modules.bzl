@@ -15,9 +15,9 @@ def define_modules(target, variant):
             "ubwcp_trace.h",
         ],
         hdrs=["include/uapi/ubwcp_ioctl.h", "include/kernel/ubwcp.h"],
-        deps = ["//vendor/qcom/kernel:all_headers"],
+        deps = ["//vendor/xiaomi/sm8450-kernel:all_headers"],
         includes = ["include", "include/kernel"],
-        kernel_build = "//vendor/qcom/kernel:{}".format(tv),
+        kernel_build = "//vendor/xiaomi/sm8450-kernel:{}".format(tv),
         visibility = ["//visibility:public"]
     )
 
