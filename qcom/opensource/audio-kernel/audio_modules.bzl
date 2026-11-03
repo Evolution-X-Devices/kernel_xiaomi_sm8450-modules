@@ -398,6 +398,34 @@ audio_modules.register(
         "wsa883x-tables.c",
     ],
 )
+# >>>> AW882XX MODULE <<<<
+audio_modules.register(
+    name = "aw882xx_dlkm",
+    path = ASOC_CODECS_PATH + "/aw882xx",
+    config_option = "CONFIG_SND_SOC_AW882XX",
+    srcs = [
+        "src/aw882xx.c",
+        "src/aw882xx_bin_parse.c",
+        "src/aw882xx_calib.c",
+        "src/aw882xx_device.c",
+        "src/aw882xx_dsp.c",
+        "src/aw882xx_init.c",
+        "src/aw882xx_monitor.c",
+        "src/aw882xx_spin.c",
+    ],
+)
+# >>>> CS35L41 MODULE <<<<
+audio_modules.register(
+    name = "cs35l41_dlkm",
+    path = ASOC_CODECS_PATH + "/cs35l41",
+    config_option = "CONFIG_SND_SOC_CS35L41",
+    srcs = [
+        "cs35l41.c",
+        "cs35l41-i2c.c",
+        "cs35l41-tables.c",
+        "wm_adsp.c",
+    ],
+)
 # >>>> WSA884X MODULE <<<<
 audio_modules.register(
     name = "wsa884x_dlkm",

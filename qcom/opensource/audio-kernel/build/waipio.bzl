@@ -34,6 +34,8 @@ def define_waipio():
             "lpass_cdc_va_macro_dlkm",
             "lpass_cdc_rx_macro_dlkm",
             "lpass_cdc_tx_macro_dlkm",
+            "aw882xx_dlkm",
+            "cs35l41_dlkm",
             "wsa883x_dlkm",
             "wcd938x_dlkm",
             "wcd938x_slave_dlkm",
@@ -51,5 +53,7 @@ def define_waipio():
             "CONFIG_SND_SOC_WCD9XXX_V2",
             "CONFIG_SND_SOC_WCD_MBHC_ADC",
             "CONFIG_MSM_EXT_DISPLAY",
+            "CONFIG_SND_SOC_AW882XX",
+            "CONFIG_SND_SOC_CS35L41",
         ]
     )
