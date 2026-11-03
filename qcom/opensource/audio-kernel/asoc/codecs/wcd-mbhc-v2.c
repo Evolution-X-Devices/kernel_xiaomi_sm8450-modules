@@ -183,8 +183,8 @@ static ssize_t headset_status_write(struct file *filp,
 	char buf[4];
 	size_t buf_size = min(count, sizeof(buf) - 1);
 	static int headset_status_write_freq = 0;
-	pr_debug("%s: enter: %d, Get(%s)\n", __func__,
-		 headset_status_write_freq, headset_status);
+	pr_debug("%s: enter: %d, Get(%*ph)\n", __func__,
+		 headset_status_write_freq, (int)sizeof(headset_status), headset_status);
 	headset_status_write_freq += 1;
 	if (copy_from_user(buf, buffer, buf_size))
 		return -EFAULT;
@@ -2240,7 +2240,7 @@ int wcd_mbhc_init(struct wcd_mbhc *mbhc, struct snd_soc_component *component,
 
 		ret = snd_soc_card_jack_new(component->card, "USB_3_5 Jack",
 					    WCD_MBHC_JACK_USB_3_5_MASK,
-					    &mbhc->usb_3_5_jack, NULL, 0);
+					    &mbhc->usb_3_5_jack);
 		if (ret) {
 			pr_err("%s: Failed to create new jack USB_3_5 Jack\n",
 			       __func__);
