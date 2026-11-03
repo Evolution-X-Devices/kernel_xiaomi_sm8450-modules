@@ -28,7 +28,7 @@
 
 #include "wm_adsp.h"
 #include "cs35l41.h"
-#include <sound/cs35l41.h>
+#include "../../../include/uapi/audio/sound/cs35l41.h"
 
 static struct regmap_config cs35l41_regmap_spi = {
 	.reg_bits = 32,

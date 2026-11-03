@@ -37,6 +37,7 @@
 #include <sound/soc.h>
 #include <sound/soc-dapm.h>
 #include <linux/gpio.h>
+#include <linux/pinctrl/consumer.h>
 #include <sound/initval.h>
 #include <sound/tlv.h>
 #include <linux/of_irq.h>
@@ -48,7 +49,7 @@
 
 #include "wm_adsp.h"
 #include "cs35l41.h"
-#include <sound/cs35l41.h>
+#include "../../../include/uapi/audio/sound/cs35l41.h"
 
 static const char * const cs35l41_supplies[] = {
 	"VA",
@@ -3062,7 +3063,7 @@ static struct snd_soc_dai_driver cs35l41_dai[] = {
 			.formats = CS35L41_TX_FORMATS,
 		},
 		.ops = &cs35l41_ops,
-		.symmetric_rates = 1,
+		.symmetric_rate = 1,
 	},
 };
 

@@ -190,7 +190,7 @@ struct wm_adsp_ops {
 	for (__i = 0; __i < 5; __i ++) { \
 		__ret = regmap_update_bits_base(map, reg, mask, val, NULL, false, false); \
 		if (__ret) { \
-		    pr_info("I2C retry : regmap_update_bits: %d, (0x%x, %x, %x), ret = %d\n", __i, reg, mask, val, __ret); \
+		    pr_info("I2C retry : regmap_update_bits: %d, (0x%x, %x, %x), ret = %d\n", __i, reg, (unsigned int)(mask), (unsigned int)(val), __ret); \
 			usleep_range(1000, 2000); \
 			continue; \
 		} \
@@ -222,7 +222,7 @@ struct wm_adsp_ops {
 	for (__i = 0; __i < 5; __i ++) { \
 		__ret = regmap_read(map, reg, val); \
 		if (__ret) { \
-		    pr_info("I2C retry : regmap_read: %d, (0x%x, %x), ret = %d\n", __i, reg, val, __ret); \
+		    pr_info("I2C retry : regmap_read: %d, (0x%x, %p), ret = %d\n", __i, reg, val, __ret); \
 			usleep_range(1000, 2000); \
 			continue; \
 		} \
@@ -238,7 +238,7 @@ struct wm_adsp_ops {
 	for (__i = 0; __i < 5; __i ++) { \
 		__ret = regmap_raw_write(map, reg, val, len); \
 		if (__ret) { \
-		    pr_info("I2C retry : regmap_raw_write: %d, (0x%x, %p, %d), ret = %d\n", __i, reg, val, len, __ret); \
+		    pr_info("I2C retry : regmap_raw_write: %d, (0x%x, %p, %zu), ret = %d\n", __i, reg, val, (size_t)(len), __ret); \
 			usleep_range(1000, 2000); \
 			continue; \
 		} \
@@ -254,7 +254,7 @@ struct wm_adsp_ops {
 	for (__i = 0; __i < 5; __i ++) { \
 		__ret = regmap_raw_write_async(map, reg, val, len); \
 		if (__ret) { \
-		    pr_info("I2C retry : regmap_raw_write_async: %d, (0x%x, %p, %d), ret = %d\n", __i, reg, val, len, __ret); \
+		    pr_info("I2C retry : regmap_raw_write_async: %d, (0x%x, %p, %zu), ret = %d\n", __i, reg, val, (size_t)(len), __ret); \
 			usleep_range(1000, 2000); \
 			continue; \
 		} \
@@ -269,7 +269,7 @@ struct wm_adsp_ops {
 	for (__i = 0; __i < 5; __i ++) { \
 		__ret = regmap_raw_read(map, reg, val, len); \
 		if (__ret) { \
-		    pr_info("I2C retry : regmap_raw_read: %d, (0x%x, %p, %d), ret = %d\n", __i, reg, val, len, __ret); \
+		    pr_info("I2C retry : regmap_raw_read: %d, (0x%x, %p, %zu), ret = %d\n", __i, reg, val, (size_t)(len), __ret); \
 			usleep_range(1000, 2000); \
 			continue; \
 		} \

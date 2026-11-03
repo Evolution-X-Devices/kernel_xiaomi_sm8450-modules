@@ -35,7 +35,8 @@ ddk_headers(
         "asoc/**/*.h",
         "dsp/**/*.h",
         "ipc/**/*.h",
-        "soc/**/*.h"
+        "soc/**/*.h",
+        "asoc/codecs/cs35l41/cs35l41-cal.c"
     ])
 )
 ddk_headers(
