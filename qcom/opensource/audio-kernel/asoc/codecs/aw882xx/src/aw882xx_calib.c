@@ -80,7 +80,7 @@ static int aw_cali_get_read_cali_re(struct aw_device *aw_dev, int32_t *cali_re,
 	pos = AW_INT_DEC_DIGIT * channel;
 
 	if (fw->size < pos + AW_INT_DEC_DIGIT) {
-		pr_err("%s: invalid firmware size: %d, channel: %d, pos: %d",
+		pr_err("%s: invalid firmware size: %zu, channel: %d, pos: %lld",
 		       __func__, fw->size, channel, pos);
 		release_firmware(fw);
 		return -EINVAL;
@@ -1202,7 +1202,7 @@ static void aw_cali_attr_deinit(struct aw_device *aw_dev)
 /*****************************attr   end***************************************************/
 
 /*****************************class node******************************************************/
-static ssize_t aw_cali_class_time_show(struct  class *class, struct class_attribute *attr, char *buf)
+static ssize_t aw_cali_class_time_show(const struct class *class, const struct class_attribute *attr, char *buf)
 {
 	ssize_t len = 0;
 
@@ -1212,8 +1212,8 @@ static ssize_t aw_cali_class_time_show(struct  class *class, struct class_attrib
 	return len;
 }
 
-static ssize_t aw_cali_class_time_store(struct class *class,
-					struct class_attribute *attr, const char *buf, size_t len)
+static ssize_t aw_cali_class_time_store(const struct class *class,
+					const struct class_attribute *attr, const char *buf, size_t len)
 {
 	int ret;
 	uint32_t time;
@@ -1237,7 +1237,7 @@ static ssize_t aw_cali_class_time_store(struct class *class,
 	return len;
 }
 
-static ssize_t aw_cali_class_cali_re_show(struct  class *class, struct class_attribute *attr, char *buf)
+static ssize_t aw_cali_class_cali_re_show(const struct class *class, const struct class_attribute *attr, char *buf)
 {
 	int ret, i;
 	struct list_head *dev_list = NULL;
@@ -1272,8 +1272,8 @@ static ssize_t aw_cali_class_cali_re_show(struct  class *class, struct class_att
 	return len;
 }
 
-static ssize_t aw_cali_class_cali_re_store(struct class *class,
-					struct class_attribute *attr, const char *buf, size_t len)
+static ssize_t aw_cali_class_cali_re_store(const struct class *class,
+					const struct class_attribute *attr, const char *buf, size_t len)
 {
 	int ret;
 	struct list_head *dev_list = NULL;
@@ -1296,7 +1296,7 @@ static ssize_t aw_cali_class_cali_re_store(struct class *class,
 	return len;
 }
 
-static ssize_t aw_cali_class_cali_f0_show(struct  class *class, struct class_attribute *attr, char *buf)
+static ssize_t aw_cali_class_cali_f0_show(const struct class *class, const struct class_attribute *attr, char *buf)
 {
 	int ret, i;
 	struct list_head *dev_list = NULL;
@@ -1331,8 +1331,8 @@ static ssize_t aw_cali_class_cali_f0_show(struct  class *class, struct class_att
 	return len;
 }
 
-static ssize_t aw_cali_class_cali_f0_store(struct class *class,
-				struct class_attribute *attr, const char *buf, size_t len)
+static ssize_t aw_cali_class_cali_f0_store(const struct class *class,
+				const struct class_attribute *attr, const char *buf, size_t len)
 {
 	int ret;
 	struct list_head *dev_list = NULL;
@@ -1351,7 +1351,7 @@ static ssize_t aw_cali_class_cali_f0_store(struct class *class,
 	return len;
 }
 
-static ssize_t aw_cali_class_f0_show(struct  class *class, struct class_attribute *attr, char *buf)
+static ssize_t aw_cali_class_f0_show(const struct class *class, const struct class_attribute *attr, char *buf)
 {
 	int ret, i;
 	struct list_head *dev_list = NULL;
@@ -1379,7 +1379,7 @@ static ssize_t aw_cali_class_f0_show(struct  class *class, struct class_attribut
 	return len;
 }
 
-static ssize_t aw_cali_class_re_show(struct  class *class, struct class_attribute *attr, char *buf)
+static ssize_t aw_cali_class_re_show(const struct class *class, const struct class_attribute *attr, char *buf)
 {
 	int ret, i;
 	struct list_head *dev_list = NULL;
@@ -1407,7 +1407,7 @@ static ssize_t aw_cali_class_re_show(struct  class *class, struct class_attribut
 	return len;
 }
 
-static ssize_t aw_class_re_range_show(struct  class *class, struct class_attribute *attr, char *buf)
+static ssize_t aw_class_re_range_show(const struct class *class, const struct class_attribute *attr, char *buf)
 {
 	int ret, i;
 	ssize_t len = 0;
@@ -1466,7 +1466,6 @@ static struct class_attribute class_att_re_range = \
 
 static struct class aw_cali_class = {
 	.name = "smartpa",
-	.owner = THIS_MODULE,
 };
 
 static void aw_cali_class_attr_init(struct aw_device *aw_dev)
