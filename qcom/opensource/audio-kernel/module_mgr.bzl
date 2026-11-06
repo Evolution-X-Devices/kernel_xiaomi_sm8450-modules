@@ -72,7 +72,24 @@ def _define_target_modules(target, variant, registry, modules, product = None, c
             srcs = srcs,
             out = "{}.ko".format(module.name),
             deps = deps,
-            local_defines = options.keys(),
+            local_defines = options.keys() + select({
+                "//vendor/xiaomi/sm8450-modules/qcom/opensource/audio-kernel:product_dagda": ["CONFIG_TARGET_PRODUCT_ZEUS"],
+                "//vendor/xiaomi/sm8450-modules/qcom/opensource/audio-kernel:product_zeus": ["CONFIG_TARGET_PRODUCT_ZEUS"],
+                "//vendor/xiaomi/sm8450-modules/qcom/opensource/audio-kernel:product_taranis": ["CONFIG_TARGET_PRODUCT_THOR"],
+                "//vendor/xiaomi/sm8450-modules/qcom/opensource/audio-kernel:product_thor": ["CONFIG_TARGET_PRODUCT_THOR"],
+                "//vendor/xiaomi/sm8450-modules/qcom/opensource/audio-kernel:product_cupid": ["CONFIG_TARGET_PRODUCT_CUPID"],
+                "//vendor/xiaomi/sm8450-modules/qcom/opensource/audio-kernel:product_ingres": ["CONFIG_TARGET_PRODUCT_INGRES"],
+                "//vendor/xiaomi/sm8450-modules/qcom/opensource/audio-kernel:product_zizhan": ["CONFIG_TARGET_PRODUCT_ZIZHAN"],
+                "//vendor/xiaomi/sm8450-modules/qcom/opensource/audio-kernel:product_unicorn": ["CONFIG_TARGET_PRODUCT_UNICORN"],
+                "//vendor/xiaomi/sm8450-modules/qcom/opensource/audio-kernel:product_ziyi": ["CONFIG_TARGET_PRODUCT_ZIYI"],
+                "//vendor/xiaomi/sm8450-modules/qcom/opensource/audio-kernel:product_mayfly": ["CONFIG_TARGET_PRODUCT_MAYFLY"],
+                "//vendor/xiaomi/sm8450-modules/qcom/opensource/audio-kernel:product_diting": ["CONFIG_TARGET_PRODUCT_DITING"],
+                "//vendor/xiaomi/sm8450-modules/qcom/opensource/audio-kernel:product_mondrian": ["CONFIG_TARGET_PRODUCT_MONDRIAN"],
+                "//vendor/xiaomi/sm8450-modules/qcom/opensource/audio-kernel:product_marble": ["CONFIG_TARGET_PRODUCT_MARBLE"],
+                "//vendor/xiaomi/sm8450-modules/qcom/opensource/audio-kernel:product_yudi": ["CONFIG_TARGET_PRODUCT_YUDI"],
+                "//vendor/xiaomi/sm8450-modules/qcom/opensource/audio-kernel:product_garnet": ["CONFIG_TARGET_PRODUCT_GARNET"],
+                "//conditions:default": [],
+            }),
         )
 
         submodule_rules.append(rule_name)

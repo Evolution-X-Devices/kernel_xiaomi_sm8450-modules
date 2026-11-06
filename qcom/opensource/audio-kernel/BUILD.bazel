@@ -5,6 +5,87 @@ package(
 )
 
 load("//build/kernel/kleaf:kernel.bzl", "ddk_headers")
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+
+string_flag(
+    name = "target_product",
+    build_setting_default = "",
+)
+
+config_setting(
+    name = "product_dagda",
+    flag_values = {":target_product": "dagda"},
+)
+
+config_setting(
+    name = "product_zeus",
+    flag_values = {":target_product": "zeus"},
+)
+
+config_setting(
+    name = "product_taranis",
+    flag_values = {":target_product": "taranis"},
+)
+
+config_setting(
+    name = "product_thor",
+    flag_values = {":target_product": "thor"},
+)
+
+config_setting(
+    name = "product_cupid",
+    flag_values = {":target_product": "cupid"},
+)
+
+config_setting(
+    name = "product_ingres",
+    flag_values = {":target_product": "ingres"},
+)
+
+config_setting(
+    name = "product_zizhan",
+    flag_values = {":target_product": "zizhan"},
+)
+
+config_setting(
+    name = "product_unicorn",
+    flag_values = {":target_product": "unicorn"},
+)
+
+config_setting(
+    name = "product_ziyi",
+    flag_values = {":target_product": "ziyi"},
+)
+
+config_setting(
+    name = "product_mayfly",
+    flag_values = {":target_product": "mayfly"},
+)
+
+config_setting(
+    name = "product_diting",
+    flag_values = {":target_product": "diting"},
+)
+
+config_setting(
+    name = "product_mondrian",
+    flag_values = {":target_product": "mondrian"},
+)
+
+config_setting(
+    name = "product_marble",
+    flag_values = {":target_product": "marble"},
+)
+
+config_setting(
+    name = "product_yudi",
+    flag_values = {":target_product": "yudi"},
+)
+
+config_setting(
+    name = "product_garnet",
+    flag_values = {":target_product": "garnet"},
+)
 
 filegroup(
     name = "audio_dt_bindings",
