@@ -30,6 +30,10 @@ def _define_module(target, variant):
     ddk_module(
         name = "{}_camera".format(tv),
         out = "camera.ko",
+        local_defines = select({
+            "//vendor/xiaomi/sm8450-modules/qcom/opensource/audio-kernel:product_zizhan": ["ZIZHAN_CAMERA=1"],
+            "//conditions:default": [],
+        }),
         srcs = [
             "drivers/cam_req_mgr/cam_req_mgr_core.c",
             "drivers/cam_req_mgr/cam_req_mgr_dev.c",
