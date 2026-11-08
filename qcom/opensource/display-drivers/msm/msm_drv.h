@@ -493,6 +493,12 @@ struct msm_display_dsc_info {
 #define MSM_DSC_RC_NVT_MAX_QP	BIT(0)
 #define MSM_DSC_RC_NVT_MIN_QP	BIT(1)
 #define MSM_DSC_PPS88_ZERO	BIT(2)
+/*
+ * Widebus DSC with bpc > 8: use the legacy (bootloader / msm-5.10) pclk-per-line of
+ * compressed bytes / 3 instead of compressed bits / source bpp, so that continuous
+ * splash handoff and seamless mode switches keep the bootloader's line timing.
+ */
+#define MSM_DSC_LEGACY_WIDEBUS_PCLK	BIT(3)
 
 /**
  * struct msm_display_vdc_info - defines vdc configuration

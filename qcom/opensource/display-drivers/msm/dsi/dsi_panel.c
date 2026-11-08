@@ -2769,6 +2769,9 @@ static void dsi_panel_parse_dsc_rc_profile(struct dsi_panel *panel)
 			MSM_DSC_RC_NVT_MIN_QP | MSM_DSC_PPS88_ZERO;
 	else
 		DSI_ERR("[%s] unknown dsc rc profile %s\n", panel->name, profile);
+
+	if (utils->read_bool(utils->data, "mi,dsc-legacy-widebus-pclk"))
+		panel->dsc_rc_profile |= MSM_DSC_LEGACY_WIDEBUS_PCLK;
 }
 
 static int dsi_panel_parse_dsc_params(struct dsi_display_mode *mode,
