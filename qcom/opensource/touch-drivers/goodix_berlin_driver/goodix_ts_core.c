@@ -1042,6 +1042,45 @@ static int goodix_parse_dt_resolution(struct device_node *node,
 }
 
 /**
+ * goodix_parse_dt_panel_id - pick the firmware and config files from the
+ * panel id GPIOs, like the stock Xiaomi driver: panel id a low and b high
+ * selects the "a" files, anything else the "b" (second source) files.
+ * Without this the driver asks for goodix_firmware.bin and
+ * goodix_cfg_group.bin, which do not exist, and the firmware fallback
+ * delays the touchscreen registration by ~25 s on every boot.
+ * @node: devicetree node
+ * @board_data: pointer to board data structure
+ */
+static void goodix_parse_dt_panel_id(struct device_node *node,
+	struct goodix_ts_board_data *board_data)
+{
+	const char *fw_name, *cfg_name;
+	int gpio_a, gpio_b, val_a, val_b;
+	bool second;
+
+	gpio_a = of_get_named_gpio(node, "goodix,panel-id-gpio-a", 0);
+	gpio_b = of_get_named_gpio(node, "goodix,panel-id-gpio-b", 0);
+	if (!gpio_is_valid(gpio_a) || !gpio_is_valid(gpio_b))
+		return;
+
+	val_a = gpio_get_value(gpio_a);
+	val_b = gpio_get_value(gpio_b);
+	second = !(val_a == 0 && val_b == 1);
+
+	if (of_property_read_string(node, second ? "goodix,firmware-nameb" :
+				    "goodix,firmware-namea", &fw_name) ||
+	    of_property_read_string(node, second ? "goodix,config-nameb" :
+				    "goodix,config-namea", &cfg_name))
+		return;
+
+	ts_info("panel id gpio a:%d b:%d, firmware %s, config %s",
+		val_a, val_b, fw_name, cfg_name);
+	strscpy(board_data->fw_name, fw_name, sizeof(board_data->fw_name));
+	strscpy(board_data->cfg_bin_name, cfg_name,
+		sizeof(board_data->cfg_bin_name));
+}
+
+/**
  * goodix_parse_dt - parse board data from dt
  * @dev: pointer to device
  * @board_data: pointer to board data structure
@@ -1154,6 +1193,9 @@ static int goodix_parse_dt(struct device_node *node,
 				TS_DEFAULT_CFG_BIN,
 				sizeof(board_data->cfg_bin_name));
 	}
+
+	/* Xiaomi panel id GPIOs override the names above */
+	goodix_parse_dt_panel_id(node, board_data);
 
 	/* get xyz resolutions */
 	r = goodix_parse_dt_resolution(node, board_data);
