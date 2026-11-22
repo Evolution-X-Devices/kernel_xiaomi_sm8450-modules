@@ -8819,8 +8819,11 @@ int dsi_display_post_enable(struct dsi_display *display)
 	 * The connector assumes the panel starts in DPMS_ON, so the first
 	 * commit after boot (continuous splash) never calls set_power(ON).
 	 * Report the panel as on once it is enabled from the off state.
+	 * Skip it when the new state is LP1/LP2 (off -> doze): set_power()
+	 * runs after this and reports the LP mode directly.
 	 */
-	if (display->panel->power_mode == SDE_MODE_DPMS_OFF) {
+	if (display->panel->power_mode == SDE_MODE_DPMS_OFF &&
+	    sde_connector_get_lp(display->drm_conn) == SDE_MODE_DPMS_ON) {
 		display->panel->power_mode = SDE_MODE_DPMS_ON;
 		dsi_display_mi_notify(display, DSI_DISPLAY_MI_POWER,
 				SDE_MODE_DPMS_ON);
