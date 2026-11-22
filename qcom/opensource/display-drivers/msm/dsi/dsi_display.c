@@ -8815,6 +8815,17 @@ int dsi_display_post_enable(struct dsi_display *display)
 	dsi_panel_release_panel_lock(display->panel);
 	dsi_display_mi_set_allowed(display, true);
 
+	/*
+	 * The connector assumes the panel starts in DPMS_ON, so the first
+	 * commit after boot (continuous splash) never calls set_power(ON).
+	 * Report the panel as on once it is enabled from the off state.
+	 */
+	if (display->panel->power_mode == SDE_MODE_DPMS_OFF) {
+		display->panel->power_mode = SDE_MODE_DPMS_ON;
+		dsi_display_mi_notify(display, DSI_DISPLAY_MI_POWER,
+				SDE_MODE_DPMS_ON);
+	}
+
 	/* remove the clk vote for CMD mode panels */
 	if (display->config.panel_mode == DSI_OP_CMD_MODE)
 		dsi_display_clk_ctrl(display->dsi_clk_handle,
