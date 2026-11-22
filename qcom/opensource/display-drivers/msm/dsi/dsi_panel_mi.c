@@ -443,11 +443,13 @@ static int dsi_panel_mi_set_dbv_lp(struct dsi_panel *panel, u32 dbv)
 	int rc;
 
 	dsi->mode_flags |= MIPI_DSI_MODE_LPM;
-	/* Same byte order as dsi_panel_update_backlight() */
+	/*
+	 * Same byte order as dsi_panel_update_backlight();
+	 * mipi_dsi_dcs_set_display_brightness_large() is not in the GKI KMI.
+	 */
 	if (panel->bl_config.bl_inverted_dbv)
-		rc = mipi_dsi_dcs_set_display_brightness_large(dsi, dbv);
-	else
-		rc = mipi_dsi_dcs_set_display_brightness(dsi, dbv);
+		dbv = ((dbv & 0xff) << 8) | ((dbv >> 8) & 0xff);
+	rc = mipi_dsi_dcs_set_display_brightness(dsi, dbv);
 	dsi->mode_flags = mode_flags;
 
 	return rc < 0 ? rc : 0;
